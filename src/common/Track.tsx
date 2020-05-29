@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const Track = props => {
-  const { className, included, vertical, style } = props;
+  const trackRef = useRef();
+  const { className, included, vertical, setRef, style } = props;
   let { length, offset, reverse } = props;
   if (length < 0) {
     reverse = !reverse;
@@ -9,6 +10,9 @@ const Track = props => {
     offset = 100 - offset;
   }
 
+  useEffect(() => {
+    setRef(trackRef.current);
+  });
   const positonStyle = vertical
     ? {
         [reverse ? 'top' : 'bottom']: `${offset}%`,
@@ -25,7 +29,11 @@ const Track = props => {
     ...style,
     ...positonStyle,
   };
-  return included ? <div className={className} style={elStyle} /> : null;
+  return included ? <div ref={trackRef} className={className} style={elStyle} /> : null;
+};
+
+Track.defaultProps = {
+  setRef: () => {},
 };
 
 export default Track;

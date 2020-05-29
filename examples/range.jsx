@@ -178,7 +178,7 @@ export default () => (
   <div>
     <div style={style}>
       <p>Basic Range，`allowCross=false`</p>
-      <Range allowCross={false} defaultValue={[0, 20]} onChange={log} />
+      <Range allowCross={false} defaultValue={[0, 20]} trackDraggable onChange={log} />
     </div>
     <div style={style}>
       <p>Basic reverse Range`</p>

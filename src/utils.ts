@@ -1,12 +1,13 @@
+/* eslint-disable react/no-find-dom-node */
 import { findDOMNode } from 'react-dom';
 import keyCode from 'rc-util/lib/KeyCode';
 
-export function isEventFromHandle(
+export function isEventFromRef(
   e: { target: HTMLElement },
-  handles: Record<number, React.ReactElement>,
+  refs: Record<number, React.ReactElement>,
 ) {
   try {
-    return Object.keys(handles).some(key => e.target === findDOMNode(handles[key]));
+    return Object.keys(refs).some(key => e.target === findDOMNode(refs[key]));
   } catch (error) {
     return false;
   }

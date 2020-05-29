@@ -38,6 +38,7 @@ export default function createSlider(Component) {
       dots: false,
       vertical: false,
       reverse: false,
+      trackDraggable: false,
       trackStyle: [{}],
       handleStyle: [{}],
       railStyle: {},
@@ -55,6 +56,7 @@ export default function createSlider(Component) {
         `Slider[max] - Slider[min] (${max - min}) should be a multiple of Slider[step] (${step})`,
       );
       this.handlesRefs = {};
+      this.tracksRefs = {};
     }
 
     componentDidMount() {
@@ -78,9 +80,21 @@ export default function createSlider(Component) {
       }
 
       const isVertical = this.props.vertical;
+      const { trackDraggable } = this.props;
       let position = utils.getMousePosition(isVertical, e);
-      if (!utils.isEventFromHandle(e, this.handlesRefs)) {
+      if (!utils.isEventFromRef(e, this.handlesRefs)) {
         this.dragOffset = 0;
+        if (trackDraggable) {
+          if (utils.isEventFromRef(e, this.tracksRefs)) {
+            this.removeDocumentEvents();
+            this.onStartTrackDrag(position);
+            this.addDocumentMouseEvents();
+            return;
+          }
+          if (e.target === this.sliderRef) {
+            return;
+          }
+        }
       } else {
         const handlePosition = utils.getHandleCenterPosition(isVertical, e.target);
         this.dragOffset = position - handlePosition;
@@ -95,9 +109,20 @@ export default function createSlider(Component) {
       if (utils.isNotTouchEvent(e)) return;
 
       const isVertical = this.props.vertical;
+      const { trackDraggable } = this.props;
       let position = utils.getTouchPosition(isVertical, e);
-      if (!utils.isEventFromHandle(e, this.handlesRefs)) {
+      if (!utils.isEventFromRef(e, this.handlesRefs)) {
         this.dragOffset = 0;
+        if (trackDraggable) {
+          if (utils.isEventFromRef(e, this.tracksRefs)) {
+            this.onStartTrackDrag(position);
+            this.addDocumentTouchEvents();
+            return;
+          }
+          if (e.target === this.sliderRef) {
+            return;
+          }
+        }
       } else {
         const handlePosition = utils.getHandleCenterPosition(isVertical, e.target);
         this.dragOffset = position - handlePosition;
@@ -110,7 +135,7 @@ export default function createSlider(Component) {
 
     onFocus = e => {
       const { onFocus, vertical } = this.props;
-      if (utils.isEventFromHandle(e, this.handlesRefs)) {
+      if (utils.isEventFromRef(e, this.handlesRefs)) {
         const handlePosition = utils.getHandleCenterPosition(vertical, e.target);
         this.dragOffset = 0;
         this.onStart(handlePosition);
@@ -155,7 +180,7 @@ export default function createSlider(Component) {
     };
 
     onKeyDown = e => {
-      if (this.sliderRef && utils.isEventFromHandle(e, this.handlesRefs)) {
+      if (this.sliderRef && utils.isEventFromRef(e, this.handlesRefs)) {
         this.onKeyboard(e);
       }
     };
@@ -251,6 +276,10 @@ export default function createSlider(Component) {
       this.handlesRefs[index] = handle;
     }
 
+    saveTrack(index, track) {
+      this.tracksRefs[index] = track;
+    }
+
     render() {
       const {
         prefixCls,
@@ -298,7 +327,6 @@ export default function createSlider(Component) {
               ...railStyle,
             }}
           />
-          {tracks}
           <Steps
             prefixCls={prefixCls}
             vertical={vertical}
@@ -314,6 +342,7 @@ export default function createSlider(Component) {
             dotStyle={dotStyle}
             activeDotStyle={activeDotStyle}
           />
+          {tracks}
           {handles}
           <Marks
             className={`${prefixCls}-mark`}

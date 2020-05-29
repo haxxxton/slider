@@ -51,6 +51,7 @@ export interface RangeProps {
   prefixCls?: string;
   included?: boolean;
   disabled?: boolean;
+  trackDraggable?: boolean;
   trackStyle?: React.CSSProperties;
   handleStyle?: React.CSSProperties;
   tabIndex?: number;
@@ -64,6 +65,7 @@ interface RangeState {
   bounds: number[];
   handle: number | null;
   recent: number;
+  trackDragPosition: number | null;
 }
 
 class Range extends React.Component<RangeProps, RangeState> {
@@ -80,7 +82,9 @@ class Range extends React.Component<RangeProps, RangeState> {
     return 0;
   }
 
-  saveHandle(index: number, h: any) {}
+  saveHandle(index: number, h: HTMLElement | null) {}
+
+  saveTrack(index: number, t: HTMLElement | null) {}
 
   removeDocumentEvents() {}
   /* eslint-enable */
@@ -91,6 +95,7 @@ class Range extends React.Component<RangeProps, RangeState> {
     count: 1,
     allowCross: true,
     pushable: false,
+    trackDraggable: false,
     tabIndex: [],
     ariaLabelGroupForHandles: [],
     ariaLabelledByGroupForHandles: [],
@@ -105,7 +110,9 @@ class Range extends React.Component<RangeProps, RangeState> {
 
   internalPointsCache: { marks: RangeProps['marks']; step: number; points: number[] };
 
-  handlesRefs: Record<number, any>;
+  handlesRefs: Record<number, HTMLElement>;
+
+  tracksRefs: Record<number, HTMLElement>;
 
   constructor(props: RangeProps) {
     super(props);
@@ -127,6 +134,7 @@ class Range extends React.Component<RangeProps, RangeState> {
       handle: null,
       recent,
       bounds,
+      trackDragPosition: null,
     };
   }
 
@@ -188,7 +196,7 @@ class Range extends React.Component<RangeProps, RangeState> {
         }
       });
 
-      if (Object.keys(controlledState).length) {
+      if (Object.keys(controlledState).length && state.trackDragPosition === null) {
         this.setState(controlledState);
       }
     }
@@ -196,6 +204,13 @@ class Range extends React.Component<RangeProps, RangeState> {
     const data = { ...this.state, ...state };
     const changedValue = data.bounds;
     props.onChange(changedValue);
+  }
+
+  onStartTrackDrag(position) {
+    this.prevMovedHandleIndex = -1;
+    this.setState({
+      trackDragPosition: position,
+    });
   }
 
   onStart(position) {
@@ -233,13 +248,23 @@ class Range extends React.Component<RangeProps, RangeState> {
 
     this.setState({
       handle: null,
+      trackDragPosition: null,
     });
   };
 
   onMove(e, position) {
     utils.pauseEvent(e);
-    const { state } = this;
-
+    const { state, props } = this;
+    if (props.trackDraggable && state.trackDragPosition !== null && state.handle === null) {
+      const oldPosition = state.trackDragPosition;
+      if (oldPosition === position) return;
+      const oldValue = this.calcValueByPos(oldPosition);
+      const newValue = this.calcValueByPos(position);
+      const amount = newValue - oldValue;
+      if (amount === 0) return;
+      this.moveTrackBy(position, amount);
+      return;
+    }
     const value = this.calcValueByPos(position);
     const oldValue = state.bounds[state.handle];
     if (value === oldValue) return;
@@ -330,6 +355,22 @@ class Range extends React.Component<RangeProps, RangeState> {
       this.internalPointsCache = { marks, step, points };
     }
     return this.internalPointsCache.points;
+  }
+
+  moveTrackBy(position: number, value: number) {
+    const { state, props } = this;
+    // if applying the value to any bound would take it outside our min/max, dont apply
+    const nextBounds = state.bounds.map(bound => bound + value);
+    if (nextBounds[0] < props.min || nextBounds[nextBounds.length - 1] > props.max) {
+      this.onChange({
+        trackDragPosition: position,
+      });
+      return;
+    }
+    this.onChange({
+      bounds: nextBounds,
+      trackDragPosition: position,
+    });
   }
 
   moveTo(value: number, isFromKeyboardEvent?: boolean) {
@@ -452,6 +493,7 @@ class Range extends React.Component<RangeProps, RangeState> {
       trackStyle,
       handleStyle,
       tabIndex,
+      trackDraggable,
       ariaLabelGroupForHandles,
       ariaLabelledByGroupForHandles,
       ariaValueTextFormatterGroupForHandles,
@@ -505,7 +547,9 @@ class Range extends React.Component<RangeProps, RangeState> {
           included={included}
           offset={offsets[i - 1]}
           length={offsets[i] - offsets[i - 1]}
+          setRef={t => this.saveTrack(i, t)}
           style={trackStyle[index]}
+          trackDraggable={trackDraggable}
           key={i}
         />
       );

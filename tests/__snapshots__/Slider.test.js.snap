@@ -8,11 +8,11 @@ exports[`Slider should render Slider with correct DOM structure 1`] = `
     class="rc-slider-rail"
   />
   <div
-    class="rc-slider-track"
-    style="left:0%;right:auto;width:0%"
+    class="rc-slider-step"
   />
   <div
-    class="rc-slider-step"
+    class="rc-slider-track"
+    style="left:0%;right:auto;width:0%"
   />
   <div
     aria-disabled="false"
@@ -38,11 +38,11 @@ exports[`Slider should render Slider without handle if value is null 1`] = `
     class="rc-slider-rail"
   />
   <div
-    class="rc-slider-track"
-    style="left:0%;right:auto;width:0%"
+    class="rc-slider-step"
   />
   <div
-    class="rc-slider-step"
+    class="rc-slider-track"
+    style="left:0%;right:auto;width:0%"
   />
   <div
     class="rc-slider-mark"

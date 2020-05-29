@@ -8,6 +8,9 @@ exports[`Range should render Multi-Range with correct DOM structure 1`] = `
     class="rc-slider-rail"
   />
   <div
+    class="rc-slider-step"
+  />
+  <div
     class="rc-slider-track rc-slider-track-1"
     style="left:0%;right:auto;width:0%"
   />
@@ -18,9 +21,6 @@ exports[`Range should render Multi-Range with correct DOM structure 1`] = `
   <div
     class="rc-slider-track rc-slider-track-3"
     style="left:0%;right:auto;width:0%"
-  />
-  <div
-    class="rc-slider-step"
   />
   <div
     aria-disabled="false"
@@ -76,11 +76,11 @@ exports[`Range should render Range with correct DOM structure 1`] = `
     class="rc-slider-rail"
   />
   <div
-    class="rc-slider-track rc-slider-track-1"
-    style="left:0%;right:auto;width:0%"
+    class="rc-slider-step"
   />
   <div
-    class="rc-slider-step"
+    class="rc-slider-track rc-slider-track-1"
+    style="left:0%;right:auto;width:0%"
   />
   <div
     aria-disabled="false"
