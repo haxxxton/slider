@@ -6,7 +6,7 @@ import Slider from '../src';
 
 const { Range } = Slider;
 
-const style = { width: 400, margin: 50 };
+const style = { width: 896, margin: 50 };
 
 function log(value) {
   console.log(value); //eslint-disable-line
@@ -178,7 +178,14 @@ export default () => (
   <div>
     <div style={style}>
       <p>Basic Range，`allowCross=false`</p>
-      <Range allowCross={false} defaultValue={[0, 20]} trackDraggable onChange={log} />
+      <Range
+        allowCross={false}
+        defaultValue={[40418, 57646]}
+        min={34539}
+        max={65348}
+        trackDraggable
+        onChange={log}
+      />
     </div>
     <div style={style}>
       <p>Basic reverse Range`</p>

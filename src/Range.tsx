@@ -362,14 +362,16 @@ class Range extends React.Component<RangeProps, RangeState> {
     // if applying the value to any bound would take it outside our min/max, dont apply
     const nextBounds = state.bounds.map(bound => bound + value);
     if (nextBounds[0] < props.min || nextBounds[nextBounds.length - 1] > props.max) {
-      this.onChange({
+      this.setState({
         trackDragPosition: position,
       });
       return;
     }
+    this.setState({
+      trackDragPosition: position,
+    });
     this.onChange({
       bounds: nextBounds,
-      trackDragPosition: position,
     });
   }
 
