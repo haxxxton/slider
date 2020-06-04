@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "rc-slider",
+  "name": "rc-slide-track-dragr",
   "builds": [
     {
       "src": "package.json",
